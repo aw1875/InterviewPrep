@@ -47,36 +47,4 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
 
     chart.append(innerChart);
-    // const wrapperDiv = document.querySelector(".chart");
-
-    // const yAxis = document.createElement("div");
-    // yAxis.classList.add("yAxis");
-
-    // for (let i = 100; i >= 0; i = i - 10) {
-    //     const p = document.createElement("p");
-    //     p.textContent = i;
-    //     yAxis.append(p);
-    // }
-
-    // wrapperDiv.append(yAxis);
-
-    // // Add content
-    // data.forEach((i) => {
-    //     const col = document.createElement("div");
-    //     col.classList.add("col");
-
-    //     const bar = document.createElement("div");
-    //     bar.classList.add("bar");
-    //     bar.style.height = `${i.percent}%`;
-    //     bar.textContent = `${i.percent}%`;
-
-    //     const title = document.createElement("p");
-    //     title.textContent = i.title
-
-    //     // Append content
-    //     col.append(bar);
-    //     col.append(title);
-
-    //     wrapperDiv.append(col);
-    // });
 });

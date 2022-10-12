@@ -1,0 +1,13 @@
+{
+  "name": "frp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "map": "node map.js",
+    "reduce": "node reduce.js",
+    "filter": "node filter.js",
+    "sort": "node sort.js",
+    "all" : "clear && yarn --silent map && yarn --silent reduce && yarn --silent filter"
+  }
+}

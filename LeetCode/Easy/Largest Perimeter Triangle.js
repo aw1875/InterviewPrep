@@ -3,8 +3,6 @@
  * @return {number}
  */
 var largestPerimeter = function(nums) {
-    if (nums.length < 3) return 0;
-
     nums.sort((a, b) => b - a);
     let i = 0, j = 1, k = 2;
 

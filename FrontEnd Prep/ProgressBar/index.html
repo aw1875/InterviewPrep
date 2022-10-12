@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <title>Progress Bar</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="script.js"></script>
+    </head>
+    <body>
+        <h1>Progress Bar</h1>
+        <h2 id="timeInterval">Current Time: 1s</h2>
+        <div class="pb_container">
+            <div class="pb_outer">
+                <p id="pb_label">0%</p>
+                <span class="pb_inner"></span>
+            </div>
+
+            <div class="times">
+                <div id="time" onclick="setTime(500);">
+                    0.5s
+                </div>
+                <div id="time" onclick="setTime(1000);">
+                    1s
+                </div>
+                <div id="time" onclick="setTime(1500);">
+                    1.5s
+                </div>
+                <div id="time" onclick="setTime(2000);">
+                    2s
+                </div>
+            </div>
+
+            <div id="start_button" onclick="startTimer();">
+                Start
+            </div>
+    </body>
+</html>

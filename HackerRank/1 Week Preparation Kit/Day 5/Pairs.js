@@ -10,8 +10,8 @@ function pairs(k, arr) {
     const values = new Set(arr);
     let pairs = 0;
 
-    for (let i = 0; i < arr.length; i++) {
-        if (values.has(arr[i] - k)) pairs++;
+    for (const num of arr) {
+        if (values.has(num - k)) pairs++;
     }
 
     return pairs;

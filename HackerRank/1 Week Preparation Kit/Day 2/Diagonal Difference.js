@@ -8,14 +8,14 @@ function diagonalDifference(arr) {
     // R -> L
     let rl = 0;
     for (let i = 0; i < arr.length; i++) {
-        rl += arr[i];
+        rl += arr[i][i];
     }
 
     // L -> R
     let lr = 0;
     for (let i = arr.length - 1; i >= 0; i--) {
-        lr += arr[i];
+        lr += arr[arr.length - 1 - i][i];
     }
 
-    console.log(rl, lr)
+    return Math.abs(rl - lr);
 }

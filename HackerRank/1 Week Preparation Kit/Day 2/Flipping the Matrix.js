@@ -5,17 +5,20 @@
  * The function accepts 2D_INTEGER_ARRAY matrix as parameter.
  */
 function flippingMatrix(matrix) {
-    let sum = 0;
+    let sum = 0, mid = matrix.length / 2;
 
-    for (let i = 0; i < matrix.length / 2; i++) {
-        for (let j = 0; j < matrix.length / 2; j++) {
-            let currentSum = 0;
-            currentSum = Math.max(matrix[i][j], currentSum);
-            currentSum = Math.max(matrix[i][matrix.length - 1 - j], currentSum);
-            currentSum = Math.max(matrix[matrix.length - 1 - i][j], currentSum);
-            currentSum = Math.max(matrix[matrix.length - 1 - i][matrix.length - 1 - j], currentSum); 21
+    // Only need to go half way l and h
+    for (let i = 0; i < mid; i++) {
+        for (let j = 0; j < mid; j++) {
 
-            sum += currentSum;
+            // Get all 4 matrices
+            const matrix1 = matrix[i][j];
+            const matrix2 = matrix[i][(mid * 2) - j - 1];
+            const matrix3 = matrix[(mid * 2) - i - 1][j];
+            const matrix4 = matrix[(mid * 2) - i - 1][(mid * 2) - j - 1];
+
+            // Add max matrix to sum;
+            sum += Math.max(matrix1, matrix2, matrix3, matrix4);
         }
     }
 

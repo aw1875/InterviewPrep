@@ -5,16 +5,22 @@
  * The function accepts 2D_INTEGER_ARRAY petrolpumps as parameter.
  */
 function truckTour(petrolpumps) {
-    let startIndex = 0;
-    let loopSum = 0;
-    for (let i = 0; i < petrolpumps.length; i++) {
-        const [amount, distance] = petrolpumps[i];
-        loopSum += amount - distance;
-        if (loopSum < 0) {
-            loopSum = 0;
-            startIndex = i + 1;
+    let sum = 0, start = 0;
+
+    /**
+     * i -> index
+     * p -> petrol
+     * d -> distance
+     * in petrolpumps
+     */
+    for (const [i, [p, d]] of petrolpumps.entries()) {
+        sum += p - d;
+
+        if (sum < 0) {
+            sum = 0;
+            start = i + 1;
         }
     }
 
-    return startIndex;
+    return start;
 }

@@ -56,7 +56,6 @@ export default function App() {
     const updateSelected = () => {
       if (!children) {
         setSelectedElement({ name, depth, children, content });
-        setQuery("");
         filteredElements = elements;
       }
       if (selectedElement?.name === name) setSelectedElement(null);
@@ -108,29 +107,32 @@ export default function App() {
   }, [])
 
   return (
-    <div className="w-full h-screen bg-gray-800 flex flex-col justify-center items-center">
+    <div className="w-full h-screen bg-gray-800 flex flex-col">
 
       {/* Side Panel */}
-      <div className="w-1/4 h-screen absolute left-0 bg-gray-700 border-gray-600 border-r-2 select-none overflow-y-auto overflow-x-hidden">
-        <h1 className="w-full h-12 mb-4 text-lg flex justify-center items-center text-white bg-gray-700 border-gray-600 border-b-2">Dynamic File Tree</h1>
-
-        {filteredElements.length > 0 && (
-          filteredElements.map((fe: Element) => createElement(fe, !!query))
-        )}
-
-        {query && !filteredElements.length && (
-          <p className="p-4 text-center text-sm text-gray-300">No Results Found</p>
-        )}
+      <div className="w-1/4 h-screen relative pb-24 bg-gray-700 border-gray-600 border-r-2 select-none overflow-hidden">
+        <h1 className="w-full h-12 text-lg flex justify-center items-center text-white bg-gray-700 border-gray-600 border-b-2">
+          {query ? "Search Results" : "Dynamic File Tree"}
+        </h1>
 
         {/* Seach Bar */}
         <input
           type="text"
-          className="w-full h-12 px-4 absolute bottom-0 bg-gray-700 border-gray-600 border-t-2 text-white focus:outline-none"
+          className="w-full h-12 px-4 bg-gray-700 border-gray-600 border-b-2 text-white focus:outline-none"
           placeholder="Search files"
           value={query}
           onChange={({ target }) => setQuery(target.value)}
         />
 
+        <div className="h-full py-4 overflow-y-auto">
+          {filteredElements.length > 0 && (
+            filteredElements.map((fe: Element) => createElement(fe, !!query))
+          )}
+
+          {query && !filteredElements.length && (
+            <p className="p-4 text-center text-sm text-gray-300">No Results Found</p>
+          )}
+        </div>
       </div>
 
       {/* Code Side */}
@@ -155,7 +157,7 @@ export default function App() {
               <button
                 className="p-4 absolute bottom-8 right-8 bg-gray-600 rounded duration-500 flex justify-center items-center gap-x-4 hover:bg-gray-500"
                 onClick={() => {
-                  navigator.clipboard.writeText(selectedElement?.content ?? "");
+                  navigator.clipboard.writeText(atob(selectedElement?.content ?? ""));
                   setCopied(true);
 
                   setTimeout(() => {
@@ -169,13 +171,13 @@ export default function App() {
 
             {/* Code Block */}
             <SyntaxHighlighter
-              language="javascript"
+              language={`${selectedElement?.name.slice(-2) === "js" ? "javascript" : "python"}`}
               style={stackoverflowDark}
               showLineNumbers={true}
               className="h-full selection:bg-green-500"
               customStyle={{ backgroundColor: "rgb(31, 41, 55)", paddingLeft: "1rem" }}
             >
-              {selectedElement.content ?? ''}
+              {atob(selectedElement.content ?? '')}
             </SyntaxHighlighter>
           </div>
         ) : (

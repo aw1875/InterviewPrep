@@ -1,6 +1,5 @@
 def solution(x, y):
     return str(int(x + ((x + y - 2) * (x + y - 1)) / 2))
-        
 
 if __name__ == "__main__":
     test_cases = {

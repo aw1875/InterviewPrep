@@ -99,6 +99,13 @@ export default function App() {
     return elements.filter((i: Element) => i.name.toLowerCase().includes(query.toLowerCase()) && !i.children);
   }
 
+  const languageType = new Map([
+    ["js", "javascript"],
+    ["py", "python"],
+    ["html", "html"],
+    ["css", "css"],
+  ]);
+
   let filteredElements = query ? filterElements() : elements;
 
   useEffect(() => {
@@ -171,7 +178,7 @@ export default function App() {
 
             {/* Code Block */}
             <SyntaxHighlighter
-              language={`${selectedElement?.name.slice(-2) === "js" ? "javascript" : "python"}`}
+              language={languageType.get(selectedElement?.name.slice(-2))}
               style={stackoverflowDark}
               showLineNumbers={true}
               className="h-full selection:bg-green-500"

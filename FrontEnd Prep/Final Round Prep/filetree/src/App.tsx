@@ -1,104 +1,32 @@
-import { ReactElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // @ts-ignore
 import { stackoverflowDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 
 // Icons
-import { FcFile, FcFolder, FcCheckmark } from 'react-icons/fc';
+import { FcFile, FcCheckmark } from 'react-icons/fc';
 import { VscClose } from 'react-icons/vsc';
 import { FiCopy } from 'react-icons/fi';
 
 // Tree Data
-import { filetree } from './Data';
+import filetree from "./Data";
 
-interface Element {
-  name: string;
-  depth: number;
-  children: boolean;
-  content?: string;
-}
+// Components
+import FileComponent from './Components/FileComponent';
+import FolderComponent from "./Components/FolderComponent";
 
-export default function App() {
+// Types
+import type File from "./@types/File";
 
-  const [elements, setSelements] = useState<Element[]>([]);
+export default function Testing() {
+
+  const [files, setFiles] = useState<File[]>([]);
   const [query, setQuery] = useState("");
-  const [selectedElement, setSelectedElement] = useState<Element | null>();
+  const [selectedFile, setSelectedFile] = useState<File | null>();
   const [copied, setCopied] = useState(false);
 
-
-  /**
-   * @description Traverse data to create elements array
-   * @param {any} head
-   * @param {number} depth
-   * @return {null}
-   */
-  const traverse = (head: any, depth: number) => {
-    if (!head) return;
-    if (!head.children) return;
-
-    for (const child of head.children) {
-      if (!child.children)
-        setSelements(elements => [...elements, { name: child.name, depth, children: false, content: child.content || null }]);
-      else
-        setSelements(elements => [...elements, { name: child.name, depth, children: true }]);
-      traverse(child, depth + 1);
-    }
-  }
-
-  /**
-   * @description Helper function for creating DOM element from Element
-   * @param {Element} name, depth, children, content
-   * @param {boolean} filter?
-   * @returns {ReactElement}
-   */
-  const createElement = ({ name, depth, children, content }: Element, filter?: boolean): ReactElement => {
-    const updateSelected = () => {
-      if (!children) {
-        setSelectedElement({ name, depth, children, content });
-        filteredElements = elements;
-      }
-      if (selectedElement?.name === name) setSelectedElement(null);
-    };
-
-    if (filter) {
-      return (
-        <div className="text-white mb-2 mx-4">
-          <span className={`flex cursor-pointer justify-start items-center gap-x-2 ${selectedElement?.name === name && 'text-green-500'}`} onClick={() => updateSelected()}>
-            {children ? (
-              <><FcFolder /> {name}</>
-            ) : (
-              <><FcFile /> {name}</>
-            )}
-          </span>
-        </div >
-      )
-    } else {
-      return (
-        <div className="text-white mb-2 mx-4" style={{ paddingLeft: `${24 * depth}px` }}>
-          <span
-            className={`flex ${!children && 'cursor-pointer'} justify-start items-center gap-x-2 ${selectedElement?.name === name && 'text-green-500'}`}
-            onClick={() => updateSelected()}
-          >
-            {children ? (
-              <><FcFolder /> {name}</>
-            ) : (
-              <><FcFile /> {name}</>
-            )}
-          </span>
-        </div >
-      )
-    }
-  }
-
-  /**
-   * @description Filter elements based on query
-   * @returns {Element[]}
-   */
-  const filterElements = (): Element[] => {
-    return elements.filter((i: Element) => i.name.toLowerCase().includes(query.toLowerCase()) && !i.children);
-  }
-
+  // Language Types Map
   const languageType = new Map([
     ["js", "javascript"],
     ["py", "python"],
@@ -106,11 +34,45 @@ export default function App() {
     ["css", "css"],
   ]);
 
-  let filteredElements = query ? filterElements() : elements;
+  /**
+   * @description Filter elements based on query
+   * @returns {Element[]}
+   */
+  const filterElements = (): File[] => {
+    return files.filter((i: File) => i.name.toLowerCase().includes(query.toLowerCase()));
+  }
+
+  let filteredElements = query ? filterElements() : files;
+
+  /**
+   * @description Update setSelectedFile from other components
+   * @param {File} file
+   * @returns {void}
+   */
+  const handleFileChange = (file: File): void => {
+    setSelectedFile(file);
+  }
+
+  /**
+   * @description Traverse filetree and get all files from their parent folders
+   * @param {any} head
+   * @return {void}
+   */
+  const getAllFiles = (head: any): void => {
+    if (!head) return;
+    if (!head.children) return;
+
+    for (const child of head.children) {
+      if (!child.children) {
+        if (!files.includes(child)) setFiles(files => [...files, child])
+      }
+
+      getAllFiles(child)
+    }
+  }
 
   useEffect(() => {
-    setSelements([{ name: filetree.name, depth: 0, children: !!filetree.children }]);
-    traverse(filetree, 1);
+    getAllFiles(filetree)
   }, [])
 
   return (
@@ -132,25 +94,28 @@ export default function App() {
         />
 
         <div className="h-full py-4 overflow-y-auto">
-          {filteredElements.length > 0 && (
-            filteredElements.map((fe: Element) => createElement(fe, !!query))
+          {query ? (
+            filteredElements.map((f: File) => <FileComponent file={f} selectedFile={selectedFile} setSelectedFile={handleFileChange} />)
+          ) : (
+            <FolderComponent filetree={filetree} selectedFile={selectedFile} setSelectedFile={handleFileChange} />
           )}
 
           {query && !filteredElements.length && (
             <p className="p-4 text-center text-sm text-gray-300">No Results Found</p>
           )}
+
         </div>
       </div>
 
       {/* Code Side */}
       <div className="w-3/4 h-screen absolute right-0 text-white">
-        {selectedElement ? (
+        {selectedFile ? (
           <div className="h-full flex flex-col bg-gray-700 gap-x-2">
             <span className="py-4 h-12 flex items-center bg-gray-700 border-gray-600 border-b-2 select-none">
               <span className="h-screen px-8 flex justify-between items-center gap-x-4 bg-gray-800 border-gray-600 border-r-2">
                 <FcFile />
-                {selectedElement?.name}
-                <VscClose size={20} className="cursor-pointer hover:text-red-400" onClick={() => setSelectedElement(null)} />
+                {selectedFile?.name}
+                <VscClose size={20} className="cursor-pointer hover:text-red-400" onClick={() => setSelectedFile(null)} />
               </span>
             </span>
 
@@ -164,7 +129,7 @@ export default function App() {
               <button
                 className="p-4 absolute bottom-8 right-8 bg-gray-600 rounded duration-500 flex justify-center items-center gap-x-4 hover:bg-gray-500"
                 onClick={() => {
-                  navigator.clipboard.writeText(atob(selectedElement?.content ?? ""));
+                  navigator.clipboard.writeText(atob(selectedFile?.content ?? ""));
                   setCopied(true);
 
                   setTimeout(() => {
@@ -178,13 +143,13 @@ export default function App() {
 
             {/* Code Block */}
             <SyntaxHighlighter
-              language={languageType.get(selectedElement?.name.slice(-2))}
+              language={languageType.get(selectedFile?.name.slice(-2))}
               style={stackoverflowDark}
               showLineNumbers={true}
               className="h-full selection:bg-green-500"
               customStyle={{ backgroundColor: "rgb(31, 41, 55)", paddingLeft: "1rem" }}
             >
-              {atob(selectedElement.content ?? '')}
+              {atob(selectedFile.content ?? '')}
             </SyntaxHighlighter>
           </div>
         ) : (

@@ -24,6 +24,7 @@ export default function Testing() {
   const [files, setFiles] = useState<File[]>([]);
   const [query, setQuery] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>();
+  const [openFiles, setOpenFiles] = useState<File[]>([]);
   const [copied, setCopied] = useState(false);
 
   // Language Types Map
@@ -45,12 +46,29 @@ export default function Testing() {
   let filteredElements = query ? filterElements() : files;
 
   /**
-   * @description Update setSelectedFile from other components
+   * @description Adds new file to open files array and sets it as selected file
    * @param {File} file
    * @returns {void}
    */
   const handleFileChange = (file: File): void => {
-    setSelectedFile(file);
+    if (!openFiles.includes(file)) setOpenFiles(openFiles => [...openFiles, file]);
+    setSelectedFile(file)
+  }
+
+  /**
+   * @description Close a file and remove from open files array
+   * @param {File} file
+   * @return {void}
+   */
+  const closeFile = (file: File): void => {
+    const fileIndex = openFiles.findIndex((i) => i === file);
+    setOpenFiles(openFiles.filter((i) => i !== file));
+
+    setTimeout(() => {
+      if (openFiles.length && selectedFile === file) setSelectedFile(openFiles[fileIndex - 1] ?? openFiles[fileIndex + 1]);
+      else if (openFiles.length) setSelectedFile(selectedFile);
+      else setSelectedFile(null);
+    }, 50);
   }
 
   /**
@@ -95,9 +113,9 @@ export default function Testing() {
 
         <div className="h-full py-4 overflow-y-auto">
           {query ? (
-            filteredElements.map((f: File) => <FileComponent file={f} selectedFile={selectedFile} setSelectedFile={handleFileChange} />)
+            filteredElements.map((f: File) => <FileComponent file={f} openFiles={openFiles} setSelectedFile={handleFileChange} />)
           ) : (
-            <FolderComponent filetree={filetree} selectedFile={selectedFile} setSelectedFile={handleFileChange} />
+            <FolderComponent filetree={filetree} openFiles={openFiles} setSelectedFile={handleFileChange} />
           )}
 
           {query && !filteredElements.length && (
@@ -108,16 +126,22 @@ export default function Testing() {
       </div>
 
       {/* Code Side */}
-      <div className="w-3/4 h-screen absolute right-0 text-white">
-        {selectedFile ? (
-          <div className="h-full flex flex-col bg-gray-700 gap-x-2">
-            <span className="py-4 h-12 flex items-center bg-gray-700 border-gray-600 border-b-2 select-none">
-              <span className="h-screen px-8 flex justify-between items-center gap-x-4 bg-gray-800 border-gray-600 border-r-2">
-                <FcFile />
-                {selectedFile?.name}
-                <VscClose size={20} className="cursor-pointer hover:text-red-400" onClick={() => setSelectedFile(null)} />
-              </span>
-            </span>
+      <div className="w-3/4 h-screen absolute right-0 text-white overflow-x-hidden">
+        {openFiles.length ? (
+          <div className="w-full h-full flex flex-col bg-gray-700">
+            <div className="flex w-full h-12 bg-gray-700 overflow-x-auto">
+              {openFiles.map((o) => (
+                <span className={`min-w-fit h-full px-4 flex 
+                                ${selectedFile === o ? 'bg-gray-800' : 'bg-gray-600'}
+                                ${selectedFile === o && 'shadow-2xl'}
+                                justify-between items-center gap-x-4 select-none`}
+                  onClick={() => setSelectedFile(o)}>
+                  <FcFile />
+                  {o?.name}
+                  <VscClose size={20} className="cursor-pointer hover:text-red-400" onClick={() => closeFile(o)} />
+                </span>
+              ))}
+            </div>
 
             {/* Copy Button */}
             {copied ? (
@@ -143,13 +167,13 @@ export default function Testing() {
 
             {/* Code Block */}
             <SyntaxHighlighter
-              language={languageType.get(selectedFile?.name.slice(-2))}
+              language={languageType.get(selectedFile?.name.slice(-2) ?? "")}
               style={stackoverflowDark}
               showLineNumbers={true}
               className="h-full selection:bg-green-500"
               customStyle={{ backgroundColor: "rgb(31, 41, 55)", paddingLeft: "1rem" }}
             >
-              {atob(selectedFile.content ?? '')}
+              {atob(selectedFile?.content ?? '')}
             </SyntaxHighlighter>
           </div>
         ) : (

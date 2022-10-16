@@ -9,11 +9,11 @@ import type File from '../@types/File';
 
 interface FolderProps {
   filetree: any;
-  selectedFile: File | null | undefined;
+  openFiles: File[];
   setSelectedFile: (file: File) => void;
 }
 
-export default function FolderComponent({ filetree, selectedFile, setSelectedFile }: FolderProps) {
+export default function FolderComponent({ filetree, openFiles, setSelectedFile }: FolderProps) {
   const [expand, setExpand] = useState(filetree.name === 'Interview Prep');
 
   if (filetree.children) {
@@ -26,13 +26,13 @@ export default function FolderComponent({ filetree, selectedFile, setSelectedFil
           <FcFolder /> {filetree.name}
         </span>
         <div className={`${!expand ? 'hidden' : 'block'} pl-[24px]`}>
-          {filetree.children.map((i: any) => <FolderComponent key={i.name} filetree={i} selectedFile={selectedFile} setSelectedFile={setSelectedFile} />)}
+          {filetree.children.map((i: any) => <FolderComponent key={i.name} filetree={i} openFiles={openFiles} setSelectedFile={setSelectedFile} />)}
         </div>
       </>
 
 
     );
   } else {
-    return <FileComponent file={filetree} selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
+    return <FileComponent file={filetree} openFiles={openFiles} setSelectedFile={setSelectedFile} />
   }
 }

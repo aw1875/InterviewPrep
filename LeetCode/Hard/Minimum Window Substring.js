@@ -14,12 +14,10 @@ var minWindow = function(s, t) {
     while (r < s.length) {
         match = addHelper(s, r, map, match);
 
-        const canSlide = () => match === t.length;
-        while (canSlide()) {
+        while (match === t.length) {
             const window = r - l + 1;
 
-            const isSmaller = window < end;
-            if (isSmaller) {
+            if (window < end) {
                 start = l;
                 end = window;
             }

@@ -3,17 +3,15 @@
  * @return {string[][]}
  */
 var groupAnagrams = function(strs) {
-    const results = [];
+    if (!strs.length) return [];
+    const map = new Map();
 
-    strs.forEach((str) => {
-        const sortedWord = str.split('').sort().join('');
+    for (const s of strs) {
+        const ss = s.split('').sort((a, b) => a.localeCompare(b)).join('');
+        const curr = map.get(ss) || [];
+        curr.push(s);
+        map.set(ss, curr);
+    }
 
-        if (results.find((v) => v.sorted === sortedWord)) {
-            results.find((v) => v.sorted === sortedWord).words.push(str);
-        } else {
-            results.push({ sorted: sortedWord, words: [str] });
-        }
-    });
-
-    return results.map((v) => (v.words)).reverse();
-}
+    return [...map.values()];
+};
